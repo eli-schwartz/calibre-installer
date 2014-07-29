@@ -8,11 +8,17 @@ force_upgrade=0
 
 # Functions
 
+calibre_is_installed()
+{
+    command -v calibre >/dev/null 2>&1
+}
+
 usage()
 {
 	cat <<- _EOF_
 		Usage: calibre-upgrade.sh [OPTIONS]
-		Upgrades calibre installation. Automaticaly checks if the current version is up to date.
+		Upgrades calibre installation. Automatically checks if the current version is up to date.
+		Must be run as root.
 
 		OPTIONS
 		    -f, --force       Force an update. This is only useful if binaries
@@ -23,8 +29,13 @@ _EOF_
 
 do_upgrade()
 {
-    calibre --shutdown-running-calibre
-    killall calibre-server
+    if calibre_is_installed; then
+        # shutdown calibre as each logged-in user.
+        for i in $(users | tr ' ' '\n' | sort -u); do
+            sudo -u $i calibre --shutdown-running-calibre
+        done
+        killall calibre-server
+    fi
     wget -nv -O- https://github.com/kovidgoyal/calibre/raw/master/setup/linux-installer.py | python -c "import sys; main=lambda x,y:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
 }
 
@@ -46,10 +57,21 @@ done
 
 # Main
 
+## Check that we are running as root
+if [[ $EUID -ne 0 ]]; then
+    echo -e "You can only install calibre if you have root permission."
+    exit 1
+fi
+
+
+
+if calibre_is_installed; then
     calibre-debug -c "import urllib as u; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version  < (tuple(map(int, u.urlopen('http://calibre-ebook.com/downloads/latest_version').read().split('.'))))))"
-
-UP_TO_DATE=$?
-
+    UP_TO_DATE=$?
+else
+    echo -e "Calibre is not installed, installing...\n\n"
+    UP_TO_DATE=1
+fi
 
 if [ "$UP_TO_DATE" = 0 ]; then
     echo "Calibre is up-to-date"
@@ -67,5 +89,6 @@ if [ "$UP_TO_DATE" = 0 ]; then
         fi
     fi
 else
+    calibre_is_installed && echo -e "Calibre is out-of-date. Upgrading...\n\n"
     do_upgrade
 fi
