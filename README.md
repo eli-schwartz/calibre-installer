@@ -5,6 +5,12 @@ Note: This can also perform the first-time install, since the version check retu
 
 Thanks to [aleyx](http://www.mobileread.com/forums/member.php?u=81327) for working out the version checking! ![2thumbsup](http://s.mobileread.com/i/smiliesadd1/2thumbsup.gif)
 
+To install this script, run the following command:
+
+```bash
+sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/calibre-installer.sh | sudo sh -
+```
+
 The following script will be saved as "/usr/bin/calibre-upgrade.sh".
 
 ```bash
