@@ -14,13 +14,14 @@ do_install()
 add_to_cron()
 {
     echo "Installing crontab..."
+    # Don't add a duplicate job. http://stackoverflow.com/questions/11532157/unix-removing-duplicate-lines-without-sorting
     (crontab -l; echo "0 6 * * 5 /usr/bin/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
 }
 
 usage()
 {
 	cat <<- _EOF_
-		Usage: calibre-installer [OPTIONS]
+		Usage: calibre-installer.sh [OPTIONS]
 		Installs the calibre-upgrade command and creates a cron job to regularly update calibre.
 
 		OPTIONS
@@ -35,7 +36,7 @@ while [ "$1" != "" ]; do
                         exit
                         ;;
         *)              echo "calibre-installer.sh: unrecognized option '$1'"
-                        echo "Try 'calibre-installer --help' for more information."
+                        echo "Try 'calibre-installer.sh --help' for more information."
                         exit 1
     esac
     shift
