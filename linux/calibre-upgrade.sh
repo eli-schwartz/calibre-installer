@@ -34,7 +34,7 @@ do_upgrade()
         for i in $(users | tr ' ' '\n' | sort -u); do
             sudo -u $i calibre --shutdown-running-calibre
         done
-        killall calibre-server
+        killall -q -v calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
     fi
     wget -nv -O- https://github.com/kovidgoyal/calibre/raw/master/setup/linux-installer.py | python -c "import sys; main=lambda x,y:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
 }
