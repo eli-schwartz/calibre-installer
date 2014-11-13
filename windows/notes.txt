@@ -1,0 +1,23 @@
+#####Command-line method of creating a task.
+
+---------------------------------------------------
+
+/tn "Name of task"
+/tr command-to-run
+/sc scheule type is weekly task
+/d day of week for /sc
+/st run at time in HH:MM:SS
+
+/ru username
+/rp password -- will prompt if switch is named, if unnamed then "Run only when user is logged on" is used.
+/rl highest -- set privilege mode, equivalent to "Run as Administrator"
+
+----------------------------------------------------
+schtasks /create /rl highest /tn "Calibre Updater" /sc weekly /d FRI /st 6:00:00 /tr %PROGRAMFILES%\calibre-upgrade.bat /ru administrator /rp
+----------------------------------------------------
+
+#####powershell 2.0 download file
+
+----------------------------------------------------
+(new-object System.Net.WebClient).DownloadFile("http://www.google.com/search.html", "google.com.html")
+----------------------------------------------------
