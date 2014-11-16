@@ -21,3 +21,32 @@ schtasks /create /rl highest /tn "Calibre Updater" /sc weekly /d FRI /st 6:00:00
 ----------------------------------------------------
 (new-object System.Net.WebClient).DownloadFile("http://www.google.com/search.html", "google.com.html")
 ----------------------------------------------------
+
+
+:: one-liner needs work...
+
+:: Set the location of files
+set upgradeDownloadFile=https://github.com/eli-schwartz/calibre-installer/raw/master/calibre-installer.bat
+set installer=%TEMP%\calibre-installer.bat
+
+:: hallelujah we can download a file
+powershell -Command "(new-object System.Net.WebClient).DownloadFile(\"%upgradeDownloadFile%\", \"%installer%\");"
+
+
+
+
+:: calibre-installer
+
+:: Set the location of calibre-upgrade
+set upgrade_script=https://github.com/eli-schwartz/calibre-installer/raw/master/windows/calibre-upgrade.bat
+set install_to=%PROGRAMFILES%\calibre-upgrade.bat
+
+:: hallelujah we can download a file
+powershell -Command "(new-object System.Net.WebClient).DownloadFile(\"%upgrade_script%\", \"%install_to%\");"
+
+
+
+
+
+:: Create a task as an administrator
+schtasks /create /tn "Calibre Updater" /sc weekly /st 06:00 /tr %install_to% /d FRI /ru administrator /rp
