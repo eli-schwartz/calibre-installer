@@ -10,7 +10,7 @@ force_upgrade=0
 
 calibre_is_installed()
 {
-    command -v calibre >/dev/null 2>&1
+    [[ -e /Applications/calibre.app ]]
 }
 
 usage()
@@ -18,13 +18,23 @@ usage()
 	cat <<- _EOF_
 		Usage: calibre-upgrade.sh [OPTIONS]
 		Upgrades calibre installation. Automatically checks if the current version is up to date.
-		Must be run as root.
 
 		OPTIONS
 		    -f, --force       Force an update. This is only useful if binaries
 		                      were updated for a critical error. :shrug:
 		    -h, --help        Displays this help message.
 _EOF_
+}
+
+install_command_line_tools()
+{
+    ## Check that we are running as root
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "You can only install the command-line tools if you have root permission."
+    else
+        #Symlink the command-line tools to /usr/bin
+        ln -s /Applications/calibre.app/Contents/console.app/Contents/MacOS/* /usr/bin/
+    fi
 }
 
 do_upgrade()
@@ -36,7 +46,14 @@ do_upgrade()
         done
         killall -q -v calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
     fi
-    wget -nv -O- https://github.com/kovidgoyal/calibre/raw/master/setup/linux-installer.py | python -c "import sys; main=lambda x,y:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
+
+    # Download and copy the DMG into /Applications
+    wget -nv -O /tmp/calibre-latest.dmg http://status.calibre-ebook.com/dist/osx
+    hdiutil attach -mountpoint /Volumes/dmg-of-calibre /tmp/calibre-latest.dmg
+    cp /Volumes/dmg-of-calibre/calibre.app /Applications
+    hdiutil detach /Volumes/dmg-of-calibre
+
+    install_command_line_tools
 }
 
 # Options
@@ -56,14 +73,6 @@ while [ "$1" != "" ]; do
 done
 
 # Main
-
-## Check that we are running as root
-if [[ $EUID -ne 0 ]]; then
-    echo -e "You can only install calibre if you have root permission."
-    exit 1
-fi
-
-
 
 if calibre_is_installed; then
     calibre-debug -c "import urllib as u; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version  < (tuple(map(int, u.urlopen('http://calibre-ebook.com/downloads/latest_version').read().split('.'))))))"
