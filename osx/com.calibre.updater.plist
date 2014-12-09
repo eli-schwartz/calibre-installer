@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.calibre.updater</string>
+
+        <key>Program</key>
+        <string>/usr/bin/calibre-upgrade.sh</string>
+
+        <key>StartCalendarInterval</key>
+        <dict>
+            <key>Weekday</key>
+            <integer>5</integer>
+            <key>Hour</key>
+            <integer>06</integer>
+            <key>Minute</key>
+            <integer>00</integer>
+        </dict>
+    </dict>
+</plist>
