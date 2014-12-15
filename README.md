@@ -11,3 +11,8 @@ To install the script on linux, run the following command:
 ```bash
 sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/linux/calibre-installer.sh | sudo sh -
 ```
+
+To install the script on OSX, run the following command:
+```bash
+sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/osx/calibre-installer.sh | sudo sh -
+```
