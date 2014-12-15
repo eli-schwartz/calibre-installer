@@ -5,6 +5,8 @@ export CALIBRE_DEVELOP_FROM=
 # by default, switch is off
 force_upgrade=0
 
+# OSX command-line-tools bin
+tools=/Applications/calibre.app/Contents/console.app/Contents/MacOS
 
 # Functions
 
@@ -33,7 +35,7 @@ install_command_line_tools()
         echo -e "You can only install the command-line tools if you have root permission."
     else
         #Symlink the command-line tools to /usr/bin
-        ln -s /Applications/calibre.app/Contents/console.app/Contents/MacOS/* /usr/bin/
+        ln -s $tools/* /usr/bin/
     fi
 }
 
@@ -42,16 +44,17 @@ do_upgrade()
     if calibre_is_installed; then
         # shutdown calibre as each logged-in user.
         for i in $(users | tr ' ' '\n' | sort -u); do
-            sudo -u $i calibre --shutdown-running-calibre
+            sudo -u $i $tools/calibre --shutdown-running-calibre
         done
-        killall -q -v calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
+        killall -q -v $tools/calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
     fi
 
     # Download and copy the DMG into /Applications
-    wget -nv -O /tmp/calibre-latest.dmg http://status.calibre-ebook.com/dist/osx
-    hdiutil attach -mountpoint /Volumes/dmg-of-calibre /tmp/calibre-latest.dmg
-    cp /Volumes/dmg-of-calibre/calibre.app /Applications
-    hdiutil detach /Volumes/dmg-of-calibre
+    ver=$(wget -q -O- http://calibre-ebook.com/downloads/latest_version)
+    wget -nv -O /tmp/calibre-${ver}.dmg http://status.calibre-ebook.com/dist/osx32
+    hdiutil attach -mountpoint /Volumes/calibre-${ver} /tmp/calibre-${ver}.dmg
+    cp /Volumes/calibre-${ver}/calibre.app /Applications
+    hdiutil detach /Volumes/calibre-${ver}
 
     install_command_line_tools
 }
@@ -75,7 +78,7 @@ done
 # Main
 
 if calibre_is_installed; then
-    calibre-debug -c "import urllib as u; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version  < (tuple(map(int, u.urlopen('http://calibre-ebook.com/downloads/latest_version').read().split('.'))))))"
+    $tools/calibre-debug -c "import urllib as u; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version  < (tuple(map(int, u.urlopen('http://calibre-ebook.com/downloads/latest_version').read().split('.'))))))"
     UP_TO_DATE=$?
 else
     echo -e "Calibre is not installed, installing...\n\n"
