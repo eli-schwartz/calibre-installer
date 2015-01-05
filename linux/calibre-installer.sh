@@ -3,19 +3,26 @@
 # Set the location of calibre-upgrade.
 upgrade_script=https://github.com/eli-schwartz/calibre-installer/raw/master/linux/calibre-upgrade.sh
 
+# Apparently Fedora demands you stick the script in /usr/local/sbin
+save_path=/usr/bin
+
+if [[ -f /etc/redhat-release ]]; then
+    save_path=/usr/local/sbin
+fi
+
 # Functions
 
 do_install()
 {
-    wget -nv -O /usr/bin/calibre-upgrade.sh $upgrade_script
-    chmod 755 /usr/bin/calibre-upgrade.sh
+    wget -nv -O ${save_path}/calibre-upgrade.sh $upgrade_script
+    chmod 755 ${save_path}/calibre-upgrade.sh
 }
 
 add_to_cron()
 {
     echo "Installing crontab..."
     # Don't add a duplicate job. http://stackoverflow.com/questions/11532157/unix-removing-duplicate-lines-without-sorting
-    (crontab -l; echo "0 6 * * 5 /usr/bin/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
+    (crontab -l; echo "0 6 * * 5 ${save_path}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
 }
 
 usage()
