@@ -1,0 +1,10 @@
+[Unit]
+Description=Upgrade calibre
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/calibre-upgrade.sh
+StandardOutput=journal
+StandardError=journal

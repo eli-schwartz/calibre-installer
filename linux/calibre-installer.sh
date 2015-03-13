@@ -1,28 +1,30 @@
 #!/bin/bash
 
-# Set the location of calibre-upgrade.
-upgrade_script=https://github.com/eli-schwartz/calibre-installer/raw/master/linux/calibre-upgrade.sh
-
-# Apparently Fedora demands you stick the script in /usr/local/sbin
-save_path=/usr/bin
-
-if [[ -f /etc/redhat-release ]]; then
-    save_path=/usr/local/sbin
-fi
+## Set defaults
+sourcefiles="https://github.com/eli-schwartz/calibre-installer/raw/master/linux/"
+prefix=""
+installwith="wget -nv -P"
 
 # Functions
 
 do_install()
 {
-    wget -nv -O ${save_path}/calibre-upgrade.sh $upgrade_script
+    ${installwith} ${save_path} ${sourcefiles}/calibre-upgrade.sh
     chmod 755 ${save_path}/calibre-upgrade.sh
 }
 
 add_to_cron()
 {
-    echo "Installing crontab..."
+    echo "Installing cron job..."
     # Don't add a duplicate job. http://stackoverflow.com/questions/11532157/unix-removing-duplicate-lines-without-sorting
     (crontab -l; echo "0 6 * * 5 ${save_path}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
+}
+
+add_systemd_timer()
+{
+    echo "Installing systemd timer..."
+    ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.timer
+    ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.service
 }
 
 usage()
@@ -33,37 +35,56 @@ usage()
 
 		OPTIONS
 		    -h, --help        Shows this help message.
+		    -l, --local       Use currentdir for resource files.
+		    -p, --prefix      Root of installation.
 _EOF_
 }
 
 # Options
 while [ "$1" != "" ]; do
     case $1 in
-        -h|--help)      usage
-                        exit
-                        ;;
-        *)              echo "calibre-installer.sh: unrecognized option '$1'"
-                        echo "Try 'calibre-installer.sh --help' for more information."
-                        exit 1
+        -h|--help)
+            usage
+            exit
+            ;;
+        -l|--local)
+            installwith="install -Dt"
+            sourcefiles="./"
+            ;;
+        --prefix)
+            shift
+            prefix="${1}"
+            ;;
+        *)
+            echo "calibre-installer.sh: unrecognized option '$1'"
+            echo "Try 'calibre-installer.sh --help' for more information."
+            exit 1
+            ;;
     esac
     shift
 done
 
 # Main
 
+# Apparently Fedora demands you stick the script in /usr/local/sbin
+save_path="${prefix}/usr/bin"
+if [[ -f /etc/redhat-release ]]; then
+    save_path="${prefix}/local/sbin"
+fi
+
 ## Check that we are running as root
-if [[ $EUID -ne 0 ]]; then
+if [[ ${EUID} -ne 0 ]]; then
     echo -e "You can only install calibre if you have root permission."
     exit 1
 fi
 
 do_install
 
-## Must check if cron is installed. Fallback on systemd (Arch Linux)?
-##   [[ -d /usr/lib/systemd ]] && echo "Lets use systemd instead."
-######################################################################
-if (command -v crontab > /dev/null 2>&1);then
+if  [[ -d /usr/lib/systemd ]]; then
+    add_systemd_timer
+elif (command -v crontab > /dev/null 2>&1);then
+    echo "Systemd not found, falling back on cron for scheduling."
     add_to_cron
 else
-    echo "Failed to install a cron job -- system doesn't have cron installed."
+    echo "Failed to install a systemd timer or cron job -- system does not have systemd or cron installed."
 fi

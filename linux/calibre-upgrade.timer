@@ -1,0 +1,8 @@
+[Unit]
+Description=Timer to upgrade calibre
+
+[Timer]
+OnCalendar=Fri 06:00
+
+[Install]
+WantedBy=multi-user.target
