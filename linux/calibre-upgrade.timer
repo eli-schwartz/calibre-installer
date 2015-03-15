@@ -3,6 +3,7 @@ Description=Timer to upgrade calibre
 
 [Timer]
 OnCalendar=Fri 06:00
+Persistent=True
 
 [Install]
 WantedBy=multi-user.target
