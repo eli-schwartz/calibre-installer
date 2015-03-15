@@ -25,6 +25,11 @@ add_systemd_timer()
     echo "Installing systemd timer..."
     ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.timer
     ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.service
+    if [[ -z "${prefix}" ]]; then
+        echo "Activating systemd timer..."
+        systemctl enable calibre-upgrade.timer
+        systemctl start calibre-upgrade.timer
+    fi
 }
 
 usage()
