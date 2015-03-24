@@ -53,7 +53,7 @@ while [ "$1" != "" ]; do
             exit
             ;;
         -l|--local)
-            installwith="install -Dt"
+            installwith="install -Dm644 -t"
             sourcefiles="./"
             ;;
         --prefix)
