@@ -35,7 +35,7 @@ install_command_line_tools()
         echo -e "You can only install the command-line tools if you have root permission."
     else
         #Symlink the command-line tools to /usr/bin
-        ln -s $tools/* /usr/bin/
+        ln -sf $tools/* /usr/bin/
     fi
 }
 
@@ -46,7 +46,9 @@ do_upgrade()
         for i in $(users | tr ' ' '\n' | sort -u); do
             sudo -u $i $tools/calibre --shutdown-running-calibre
         done
-        killall -q -v $tools/calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
+        killall $tools/calibre-server > /dev/null 2>&1 \
+            && echo -e "A running instance of calibre-server was killed. Restart when upgrade is finished. ;)\n\n" \
+            || echo -e "No running calibre servers.\n\n"
     fi
 
     # Download and copy the DMG into /Applications
