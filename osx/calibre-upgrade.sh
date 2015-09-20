@@ -53,9 +53,10 @@ do_upgrade()
 
     # Download and copy the DMG into /Applications
     ver=$(wget -q -O- http://code.calibre-ebook.com/latest)
-    wget -nv -O /tmp/calibre-${ver}.dmg http://code.calibre-ebook.com/dist/osx32
+
+    wget --continue -O /tmp/calibre-${ver}.dmg http://code.calibre-ebook.com/dist/osx32
     hdiutil attach -mountpoint /Volumes/calibre-${ver} /tmp/calibre-${ver}.dmg
-    cp /Volumes/calibre-${ver}/calibre.app /Applications
+    cp -R /Volumes/calibre-${ver}/calibre.app /Applications
     hdiutil detach /Volumes/calibre-${ver}
 
     install_command_line_tools
