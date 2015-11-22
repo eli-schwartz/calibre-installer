@@ -34,8 +34,8 @@ install_command_line_tools()
     if [[ $EUID -ne 0 ]]; then
         echo -e "You can only install the command-line tools if you have root permission."
     else
-        #Symlink the command-line tools to /usr/bin
-        ln -sf $tools/* /usr/bin/
+        #Symlink the command-line tools to /usr/local/bin
+        ln -sf $tools/* /usr/local/bin/
     fi
 }
 
