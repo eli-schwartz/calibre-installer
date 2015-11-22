@@ -6,7 +6,7 @@
         <string>com.calibre.updater</string>
 
         <key>Program</key>
-        <string>/usr/bin/calibre-upgrade.sh</string>
+        <string>/usr/local/bin/calibre-upgrade.sh</string>
 
         <key>StartCalendarInterval</key>
         <dict>
