@@ -8,8 +8,8 @@ launchd_plist=https://github.com/eli-schwartz/calibre-installer/raw/master/osx/c
 
 do_install()
 {
-    wget -nv -O /usr/bin/calibre-upgrade.sh $upgrade_script
-    chmod 755 /usr/bin/calibre-upgrade.sh
+    wget -nv -O /usr/local/bin/calibre-upgrade.sh $upgrade_script
+    chmod 755 /usr/local/bin/calibre-upgrade.sh
 }
 
 add_launchd()
