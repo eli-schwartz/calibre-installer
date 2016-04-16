@@ -56,7 +56,7 @@ while [ "$1" != "" ]; do
             installwith="install -Dm644 -t"
             sourcefiles="./"
             ;;
-        --prefix)
+        -p|--prefix)
             shift
             prefix="${1}"
             ;;
