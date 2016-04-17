@@ -9,10 +9,10 @@ Thanks to [aleyx](http://www.mobileread.com/forums/member.php?u=81327) for worki
 To install the script on linux, run the following command:
 
 ```bash
-sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/linux/calibre-installer.sh | sudo sh -
+sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/linux/calibre-installer.sh | sudo bash -
 ```
 
 To install the script on OSX, run the following command:
 ```bash
-sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/osx/calibre-installer.sh | sudo sh -
+sudo -v && wget -nv -O- https://github.com/eli-schwartz/calibre-installer/raw/master/osx/calibre-installer.sh | sudo bash -
 ```

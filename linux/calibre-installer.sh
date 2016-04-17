@@ -17,7 +17,7 @@ add_to_cron()
 {
     echo "Installing cron job..."
     # Don't add a duplicate job. http://stackoverflow.com/questions/11532157/unix-removing-duplicate-lines-without-sorting
-    (crontab -l; echo "0 6 * * 5 ${save_path}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
+    (crontab -l 2>/dev/null; echo "0 6 * * 5 ${save_path}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
 }
 
 add_systemd_timer()
@@ -41,7 +41,7 @@ usage()
 		OPTIONS
 		    -h, --help        Shows this help message.
 		    -l, --local       Use currentdir for resource files.
-		    -p, --prefix      Root of installation.
+		    -p, --prefix      Install root (for packaging purposes).
 _EOF_
 }
 
