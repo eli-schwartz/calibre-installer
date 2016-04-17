@@ -23,6 +23,7 @@ usage()
 		OPTIONS
 		    -f, --force       Force an update. This is only useful if binaries
 		                        were updated for a critical error. :shrug:
+		    -p, --prefix      Root of installation. calibre is installed by default to /opt
 		    -h, --help        Displays this help message.
 _EOF_
 }
@@ -36,7 +37,7 @@ do_upgrade()
         done
         killall -q -v calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
     fi
-    wget -nv -O- https://github.com/kovidgoyal/calibre/raw/master/setup/linux-installer.py | python -c "import sys; main=lambda x,y:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
+    wget -nv -O- https://github.com/kovidgoyal/calibre/raw/master/setup/linux-installer.py | python -c "import sys; main=lambda x,y:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main('${prefix}')"
 }
 
 # Options
@@ -48,6 +49,10 @@ while [ "$1" != "" ]; do
             ;;
         -f|--force)
             force_upgrade=1
+            ;;
+        -p|--prefix)
+            shift
+            prefix="${1}"
             ;;
         *)
             echo "calibre-upgrade.sh: unrecognized option '$1'"
