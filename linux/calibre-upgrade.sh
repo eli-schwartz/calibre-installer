@@ -22,7 +22,7 @@ usage()
 
 		OPTIONS
 		    -f, --force       Force an update. This is only useful if binaries
-		                      were updated for a critical error. :shrug:
+		                        were updated for a critical error. :shrug:
 		    -h, --help        Displays this help message.
 _EOF_
 }
@@ -32,7 +32,7 @@ do_upgrade()
     if calibre_is_installed; then
         # shutdown calibre as each logged-in user.
         for i in $(users | tr ' ' '\n' | sort -u); do
-            sudo -u $i calibre --shutdown-running-calibre
+            sudo -u ${i} calibre --shutdown-running-calibre
         done
         killall -q -v calibre-server && echo -e "Restart when upgrade is finished. ;)\n\n" || echo -e "No running calibre servers.\n\n"
     fi
@@ -42,15 +42,17 @@ do_upgrade()
 # Options
 while [ "$1" != "" ]; do
     case $1 in
-        -h|--help)      usage
-                        exit
-                        ;;
-        -f|--force)     shift
-                        force_upgrade=1
-                        ;;
-        *)              echo "calibre-upgrade.sh: unrecognized option '$1'"
-                        echo "Try 'calibre-upgrade.sh --help' for more information."
-                        exit 1
+        -h|--help)
+            usage
+            exit
+            ;;
+        -f|--force)
+            force_upgrade=1
+            ;;
+        *)
+            echo "calibre-upgrade.sh: unrecognized option '$1'"
+            echo "Try 'calibre-upgrade.sh --help' for more information."
+            exit 1
     esac
     shift
 done
@@ -58,7 +60,7 @@ done
 # Main
 
 ## Check that we are running as root
-if [[ $EUID -ne 0 ]]; then
+if [[ ${EUID} -ne 0 ]]; then
     echo -e "You can only install calibre if you have root permission."
     exit 1
 fi
@@ -73,15 +75,15 @@ else
     UP_TO_DATE=1
 fi
 
-if [ "$UP_TO_DATE" = 0 ]; then
+if [ "${UP_TO_DATE}" = 0 ]; then
     echo "Calibre is up-to-date"
 
-    if [ "$force_upgrade" = 1 ]; then
+    if [ "${force_upgrade}" = 1 ]; then
         echo ""
         echo "Forcing upgrade anyway -- are you sure you want to continue? [y/n]"
         read answer
 
-        if [[ "$answer" = "y" || "$answer" = "yes" ]]; then
+        if [[ "${answer}" = "y" || "${answer}" = "yes" ]]; then
             do_upgrade
         else
             echo "Exiting..."
