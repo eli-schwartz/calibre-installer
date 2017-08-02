@@ -81,7 +81,8 @@ done
 # Main
 
 if calibre_is_installed; then
-    $tools/calibre-debug -c "import urllib as u; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version  < (tuple(map(int, u.urlopen('http://calibre-ebook.com/downloads/latest_version').read().split('.'))))))"
+    $tools/calibre-debug -c "from calibre.gui2.update import get_newest_version; from calibre.constants import numeric_version; raise SystemExit(int(numeric_version < get_newest_version()))"
+
     UP_TO_DATE=$?
 else
     echo -e "Calibre is not installed, installing...\n\n"
