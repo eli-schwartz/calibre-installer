@@ -2,30 +2,30 @@
 
 ## Set defaults
 sourcefiles="https://github.com/eli-schwartz/calibre-installer/raw/master/linux/"
-prefix=""
+destdir=""
 installwith="wget -nv -P"
 
 # Functions
 
 do_install()
 {
-    ${installwith} ${save_path} ${sourcefiles}/calibre-upgrade.sh
-    chmod 755 ${save_path}/calibre-upgrade.sh
+    ${installwith} "${destdir}${bindir}" "${sourcefiles}/calibre-upgrade.sh"
+    chmod 755 "${destdir}${bindir}/calibre-upgrade.sh"
 }
 
 add_to_cron()
 {
     echo "Installing cron job..."
     # Don't add a duplicate job. http://stackoverflow.com/questions/11532157/unix-removing-duplicate-lines-without-sorting
-    (crontab -l 2>/dev/null; echo "0 6 * * 5 ${save_path}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
+    (crontab -l 2>/dev/null; echo "0 6 * * 5 ${bindir}/calibre-upgrade.sh > /dev/null 2>&1") | cat -n - |sort -uk2 |sort -nk1 | cut -f2-| crontab -
 }
 
 add_systemd_timer()
 {
     echo "Installing systemd timer..."
-    ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.timer
-    ${installwith} ${prefix}/usr/lib/systemd/system ${sourcefiles}/calibre-upgrade.service
-    if [[ -z "${prefix}" ]]; then
+    ${installwith} "${destdir}/usr/lib/systemd/system" "${sourcefiles}/calibre-upgrade.timer"
+    ${installwith} "${destdir}/usr/lib/systemd/system" "${sourcefiles}/calibre-upgrade.service"
+    if [[ -z "${destdir}" ]]; then
         echo "Activating systemd timer..."
         systemctl enable calibre-upgrade.timer
         systemctl start calibre-upgrade.timer
@@ -41,7 +41,7 @@ usage()
 		OPTIONS
 		    -h, --help        Shows this help message.
 		    -l, --local       Use currentdir for resource files.
-		    -p, --prefix      Install root (for packaging purposes).
+		    -d, --destdir     Install root (for packaging purposes).
 _EOF_
 }
 
@@ -56,9 +56,9 @@ while [ "$1" != "" ]; do
             installwith="install -Dm644 -t"
             sourcefiles="./"
             ;;
-        -p|--prefix)
+        -d|--destdir)
             shift
-            prefix="${1}"
+            destdir="${1}"
             ;;
         *)
             echo "calibre-installer.sh: unrecognized option '$1'"
@@ -72,9 +72,9 @@ done
 # Main
 
 # Apparently Fedora demands you stick the script in /usr/local/sbin
-save_path="${prefix}/usr/bin"
+bindir="/usr/bin"
 if [[ -f /etc/redhat-release ]]; then
-    save_path="${prefix}/local/sbin"
+    bindir="/usr/local/sbin"
 fi
 
 ## Check that we are running as root
